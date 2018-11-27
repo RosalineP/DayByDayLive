@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DayByDay Live</title>
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.2.1.js') }}"></script>
+    <!-- cookie plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- checkboxes styling -->
+    <link rel="stylesheet" href=" https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- plugin for time/date form inputs, not native to bootstrap -->
+    <script type="text/javascript" src="{{ url_for('static', filename='moment/moment.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/transition.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/collapse.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/bootstrap-datetimepicker.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/bootstrap-datetimepicker.min.css') }}" />
+    <!-- plugin for nicely designed dropdown selectors -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+    <!-- canvasJS for log -->
+    <script src="http://cs.wellesley.edu/~czheng/cs304project/canvasjs.min.js"></script>
+    <!-- our own js -->
+    <script type="text/javascript" src="{{ url_for('static', filename='base_task.js') }}"></script>
+    <!-- our own styling -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+
+<body>
+
+<div id = "header">
+
+  <div id = "headerleft"> <div class = "horizontalSpacer" style = "width: 14%;"> </div> DayByDay </div>
+  <div id = "headerright" > {% block timeInfo %} {% endblock %} </div>
+
+</div>
+
+<!-- Main content box that holds left panel and right panel -->
+<div id = "container">
+
+  <!-- Left panel -->
+  <div id = "container1">
+    <br><p class = "spacer"></p>
+
+      <!-- select view for time -->
+      <form id = "changeViewForm" style = "width: 100% !important; display: inline-block;">
+
+        <div class = "horizontalSpacer" style = "width: 10%;"> </div>
+        <!-- dropdown for user's time-view selection -->
+        <div class = "form-group time_selector" style = "display: inline-block; width:80% !important;">
+          <select class = "form-control"  name="time" id="time" onchange="timeChoose(); changeView();" >
+          {% block timeSelect %}
+            <option value="day">Day View</option>
+            <option value="week">Week View</option>
+            <option value="month">Month View</option>
+          {% endblock %}
+          </select>
+        </div>
+        <p class = "spacer"></p>
+
+        <div class = "horizontalSpacer" style = "width: 10%;"> </div>
+        <!-- dropdown for user's data-view selection -->
+        <div class = "form-group data_selector" style = "display: inline-block; width:80% !important;">
+          <select class = "form-control" name="views" id="views" onchange="dataChoose(); changeView();">
+            <option value="checklist">Checklist View</option>
+            <option value="events">Events View</option>
+            <option value="log">Log View</option>
+          </select>
+        </div>
+        </form>
+        <p class = "spacer"></p>
+
+        <!-- load in user's categories -->
+        {% block categories %}
+        <div class = "horizontalSpacer" style = "width: 10%;"> </div>
+        <div id = "categories" style = "display: inline-block;">
+          <form id = "catTickForm">
+
+            <!-- catall checkbox -->
+            <div class="pretty p-default p-curve">
+              <input type="checkbox" name="cat" id = "catall" onchange="checkCat(this,true); catTick();" value="allCats"/>
+              <div class="state">
+                <label>All Categories</label>
+              </div>
+            </div>
+            <br>
+
+            <!-- for coloring styling of all user-created categories, passed in to block below -->
+            {% set d = {'418ACA':'p-primary', '5DB85B':'p-success', 'F0AD4E':'p-warning', '5BC0DE':'p-info', 'D9534E':'p-danger'} %}
+            {% for cat in allCats %}
+
+            <!-- generate checkbox for every category -->
+            <div class="pretty p-default p-curve">
+                <input type="checkbox" class = "cat" name="cat" id = "cat{{cat['name']}}" onchange="checkCat(this,true); catTick();" value="{{cat['name']}}" />
+                <div class="state {{  d[cat['color']]  }} generatedCat">
+                    <label><font color=" {{cat['color']}}  "> {{cat['name']}}  </font></label>
+                </div>
+            </div>
+            <br>
+            {% endfor %}
+
+            <!-- hidden inputs for back-end processing -->
+            <input type = "hidden" name = "catHidden" id = "catTickId" value = "0">
+            <input type = "hidden" name = "catHiddenRedirect" id = "catTickRedirect" value = "0">
+          </form>
+        </div>
+
+        {% endblock %}
+
+        <p class = "spacer"></p><br>
+
+        <div>
+          <div class = "horizontalSpacer" style = "width: 10%;" >  </div>
+
+          <!-- all '+ Feature' items within the Bootstrap accordion are contained here -->
+          <div class = "addElements" style = "display: inline-block; width:80%; ">
+          <div class="panel-group" id="accordion">
+
+            <!-- + Category -->
+            <form id="addCategory" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" >+ Category</a>
+                </h4>
+              </div>
+
+              <div id="collapseOne" class="panel-collapse collapse">
+                <div class="panel-body">
+
+                  <!-- text input category name -->
+                  <input type='text' class="form-control" name='catName' placeholder="Category Name"><br>
+
+                  <!-- custom color selector dropdowm -->
+                  <select class="selectpicker" data-width="80%" name = 'catColor'>
+                    <option>Pick Color</option>
+                    <option value = "418ACA" style="background: #418ACA; color: #fff;">Blue</option>
+                    <option value = "5DB85B" style="background: #5DB85B;color: #fff;">Green</option>
+                    <option value = "F0AD4E" style="background: #F0AD4E;color: #fff;">Yellow</option>
+                    <option value = "5BC0DE" style="background: #5BC0DE;color: #fff;">Cyan</option>
+                    <option value = "D9534E" style="background: #D9534E;color: #fff;">Red</option>
+                  </select>
+
+                  <br><p class = "spacer"></p><br>
+
+                  <!-- <input id="addCategorySubmit" class="btn btn-default" type="submit" value="Submit"> -->
+                  <input id="addCategorySubmit" style="width:70%;" class="btn btn-default" value="Submit">
+                </div>
+              </div>
+            </form>
+
+            <!-- + Task -->
+            <form id="addTask" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">+ Task</a>
+                </h4>
+              </div>
+
+              <div id="collapseTwo" class="panel-collapse collapse">
+                <div class="panel-body">
+
+                <!-- category selector dropdown -->
+                <select class = "form-control canUpdateCat" name="catOpt" id = "catOpt">
+                 <option value="none">Choose Category</option>
+                 {% block add_dropdown %}
+                   {% for cat in allCats %}
+                    <option value="{{cat['name']}}"> {{cat['name']}} </option>
+                   {% endfor %}
+                 {% endblock %}
+                </select>
+                <br>
+
+                <!-- text input for task name -->
+                <input type='text' class="form-control"  name='catName' placeholder="Task Name"><br>
+
+                <!-- input for start date and end date -->
+                <div class='input-group date' id='datetimepicker6'>
+                    <input type='text' name='startDate' class="form-control" placeholder="Start Date"/>
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+                <br>
+                <div class='input-group date' id='datetimepicker7'>
+                    <input type='text' name='endDate' class="form-control" placeholder="End Date"/>
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+                <br>
+
+                <!-- where generated subtask forms are sent -->
+                <div id = "subtasks"></div>
+
+                <!-- 'add subtask' button -->
+                <input class="btn btn-default" type="button" value="Add subtask" id = "add"><br>
+                <input type = "hidden" name = "num" id = "num" value = "0"><br>
+
+                <input id="addTaskSubmit" style="width:70%;" class="btn btn-default" value="Submit">
+                </div>
+              </div>
+            </form>
+
+            <!-- + Log Entry -->
+            <form id="addLog" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">+ Log Entry</a>
+                </h4>
+              </div>
+
+              <div id="collapseThree" class="panel-collapse collapse">
+                <div class="panel-body">
+
+                  <!-- category selector dropdown -->
+                  <select class = "form-control canUpdateCat" name="catName" id = "catOpt">
+                    <option value="none">Choose Category</option>
+                    {% for cat in allCats %}
+                      <option value="{{cat['name']}}"> {{cat['name']}} </option>
+                    {% endfor %}
+                  </select><br>
+
+                  <!-- log number of hours input -->
+                  <input type='text' class="form-control" name='hour' placeholder = "Hours"><br>
+
+                  <!-- datepicker form element -->
+                  <div class='input-group date' id='datetimepicker1'>
+                      <input type='text' class="form-control" name='taskDate' placeholder = "Task Date"/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                  </div><br>
+
+                  <input id="addLogSubmit" style="width:70%;" class="btn btn-default" value="Submit">
+                </div>
+              </div>
+            </form>
+
+            <!-- + Event -->
+            <form id="addEvent" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour">+ Event</a>
+                </h4>
+              </div>
+
+              <div id="collapseFour" class="panel-collapse collapse">
+                <div class="panel-body">
+
+                  <!-- event name text input -->
+                  <input type='text' class="form-control" name='eventName' placeholder="Event Name"><br>
+
+                  <!-- date form element -->
+                  <div class='input-group date' id='datetimepicker4'>
+                      <input type='text' class="form-control" name='eventDate' placeholder = "Event Date"/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                  </div><br>
+
+                  <!-- start time form element -->
+                  <div class='input-group date' id='datetimepicker2'>
+                      <input type='text' class="form-control" name='startTime' placeholder = "Start Time"/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-time"></span>
+                      </span>
+                  </div><br>
+
+                  <!-- end time form element -->
+                  <div class='input-group date' id='datetimepicker3'>
+                      <input type='text' class="form-control" name='endTime' placeholder = "End Time"/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-time"></span>
+                      </span>
+                  </div><br>
+
+                  <input id="addEventSubmit" class="btn btn-default" style="width:70%;" value="Submit">
+
+                </div>
+              </div>
+            </form>
+
+
+          </div>
+          </div>
+
+
+          <br><p class = "spacer"></p>
+          <div id="pulseMessages" style="display: none; width: 60%; margin: auto; color: #418ACA; text-align:center; border-radius: 5px; border: 1px solid #418ACA;">   </div>
+
+        </div>
+  </div>
+
+    <!-- Right panel -->
+    <div id = "container2">
+      {% block rightPanel %} {% endblock %}
+      {% block customize %} {% endblock %}
+    </div>
+
+  <!-- end of div 'container' -->
+  </div>
+
+
+
+</body>
+</html>

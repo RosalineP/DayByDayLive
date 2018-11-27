@@ -1,0 +1,80 @@
+html, body {
+margin: 0px;
+padding: 0px;
+border: 0px;
+}
+
+html {
+height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+.form-group{
+  width: 60%;
+}
+
+.horizontalSpacer{
+  display: inline-block;
+  text-align: left;
+}
+
+#header{
+background-color: #FFFFFF;
+width: 100%;
+height: 50px;
+}
+
+
+#headerleft{
+background-color: #FFFFFF;
+width: 15%;
+height: 100%;
+display: inline-block;
+font-size: 190%;
+vertical-align: middle;
+line-height: 70px;
+}
+
+#headerright{
+height: 100%;
+width: 84.5%;
+vertical-align: middle;
+font-size: 190%;
+line-height: 70px;
+display: inline-block;
+}
+
+#container{
+  background-color: #FFFFFF;
+  width: 100%;
+  height: 100%;
+}
+
+#container1{
+  background-color: #FFFFFF;
+  float: left;
+  width: 15%;
+  height: 100%;
+}
+
+#container2{
+  background-color: #FFFFFF;
+  float: left;
+  width: 84.5%;
+  height: 100%;
+}
+
+#categories{
+  width: 40%;
+}
+
+.addElements{
+  width: 80%;
+}
+
+.spacer{
+  margin-bottom: 2px;
+} 
