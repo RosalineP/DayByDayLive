@@ -142,6 +142,9 @@ $(function(){
       type: 'POST',
       success: function(data){
 
+        console.log("In ajax:");
+        console.log(data);
+
         //reset accordion
         $('#collapseOne').collapse('hide');
         $('#addCategory')[0].reset();
@@ -152,6 +155,7 @@ $(function(){
           pulseMessage(data.error,'#D9534E');
           return;
         }
+
         pulseMessage("Category Added","#418ACA");
 
         //update other form dropdowns

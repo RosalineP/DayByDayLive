@@ -31,4 +31,18 @@ class Categories(db.Model):
 def initialPage():
     return render_template('base.html')
 
+@app.route('/addCat/', methods = ['POST'])
+def addCat():
+
+    name = request.form['catName']
+    color = request.form['catColor']
+
+    # cat = Categories(name, color, "user1")
+    # db.session.add(cat)
+    # db.session.commit()
+
+    data = {"catName": name, "catColor": color}
+    return jsonify(data)
+
+
 

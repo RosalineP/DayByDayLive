@@ -16,11 +16,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- plugin for time/date form inputs, not native to bootstrap -->
-    <script type="text/javascript" src="{{ url_for('static', filename='moment/moment.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/transition.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/collapse.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/bootstrap-datetimepicker.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/bootstrap-datetimepicker.min.css') }}" />
+    <script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
     <!-- plugin for nicely designed dropdown selectors -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
@@ -304,6 +302,16 @@
 
   <!-- end of div 'container' -->
   </div>
+
+ {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 
 
