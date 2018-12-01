@@ -1,3 +1,28 @@
+//Onload
+    $(document).ready(function() {
+
+    // date form element function for '+ Log Entry'
+    $(function () {
+        $('#datetimepicker1').datetimepicker({format: 'YYYY-MM-DD'});
+    });
+
+    // date form element function for '+ Event'
+    $(function () {
+        $('#datetimepicker4').datetimepicker({format: 'YYYY-MM-DD'});
+    });
+
+    // start time and end time form elements functions for '+ Event'
+    $(function () {
+        $('#datetimepicker2').datetimepicker({ format: 'HH:mm' });
+    });
+    $(function () {
+      $('#datetimepicker3').datetimepicker({ format: 'HH:mm' });
+    });
+
+  });
+
+
+
 //Ajax Calls (and pulseMessage) -----------------------------------------------------------------------------------------------------
 
 //displays message in sidebar showing confirmation of success (in blue)
@@ -152,8 +177,9 @@ $(function(){
 
         //check for errors, and pulse them if they exist
         if (data.error){
-          pulseMessage(data.error,'#D9534E');
-          return;
+            console.log("inside data.error");
+            pulseMessage(data.error,'#D9534E');
+            return;
         }
 
         pulseMessage("Category Added","#418ACA");
@@ -171,6 +197,7 @@ $(function(){
 
       },
       error: function(error){
+        console.log("in error");
         console.log(error);
       }
     });

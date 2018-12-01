@@ -94,7 +94,7 @@
 
             <!-- generate checkbox for every category -->
             <div class="pretty p-default p-curve">
-                <input type="checkbox" class = "cat" name="cat" id = "cat{{cat['name']}}" onchange="checkCat(this,true); catTick();" value="{{cat['name']}}" />
+                <input type="checkbox" class = "cat" name="cat" id = "cat{{cat['name']}}" onchange="catTick();" value="{{cat['name']}}" checked="{{cat['checked']}}" />
                 <div class="state {{  d[cat['color']]  }} generatedCat">
                     <label><font color=" {{cat['color']}}  "> {{cat['name']}}  </font></label>
                 </div>
